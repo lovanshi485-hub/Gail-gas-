@@ -1,0 +1,6 @@
+{
+  "name": "GAIL Gas PMC Field Manager Pro",
+  "description": "Professional field management application for GAIL Gas PMC teams supporting customer records, feasibility surveys, TNF tracking, gas-in completion, DPR editor, and offline sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
