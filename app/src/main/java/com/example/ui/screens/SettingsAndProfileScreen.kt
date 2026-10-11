@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Engineering
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -48,6 +50,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -101,6 +104,7 @@ fun SettingsAndProfileScreen(
     var notificationsEnabled by remember { mutableStateOf(true) }
     var autoSyncOnWifi by remember { mutableStateOf(true) }
     var gpsTrackingOnSurvey by remember { mutableStateOf(false) }
+    var showClearDbDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -109,7 +113,7 @@ fun SettingsAndProfileScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Direct Mobile APK Download Card (For instant phone installation without PC)
+        // Direct Mobile APK Download Card (For standalone installation on Android devices)
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
@@ -120,10 +124,10 @@ fun SettingsAndProfileScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Android, contentDescription = null, tint = Color(0xFF2E7D32), modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("DIRECT APK DOWNLOAD (PHONE SE USE KAREIN)", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF2E7D32))
+                    Text("STANDALONE ANDROID APK & MOBILE ACCESS", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color(0xFF2E7D32))
                 }
                 Text(
-                    text = "Aap bina laptop/desktop ke apne smartphone par seedhe app chala sakte hain! AI Studio web app ya APK direct download karein:",
+                    text = "Operate the full PMC portal directly on any Android smartphone without a desktop computer. Build, install, or launch via:",
                     fontSize = 12.sp,
                     color = Color(0xFF1B5E20)
                 )
@@ -140,12 +144,12 @@ fun SettingsAndProfileScreen(
                     ) {
                         Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Open Full App", fontSize = 12.sp)
+                        Text("Web / Cloud Link", fontSize = 12.sp)
                     }
 
                     Button(
                         onClick = {
-                            Toast.makeText(context, "AI Studio Header Menu -> Download APK / Export Project", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "AI Studio Top Bar -> Settings Menu -> Export APK / Project ZIP", Toast.LENGTH_LONG).show()
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GailNavy),
                         modifier = Modifier.weight(1f),
@@ -439,16 +443,17 @@ fun SettingsAndProfileScreen(
             }
         }
 
-        // Data Backup & Restore
+        // Data Management & Offline Storage
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(2.dp)
+            elevation = CardDefaults.cardElevation(2.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("DATA BACKUP & LOCAL CACHE", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = GailNavy)
+                Text("DATABASE STORAGE & LOCAL CACHE", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = GailNavy)
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = {
                             Toast.makeText(context, "Local database encrypted and backed up", Toast.LENGTH_SHORT).show()
@@ -457,26 +462,93 @@ fun SettingsAndProfileScreen(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(Icons.Default.Backup, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Backup, contentDescription = null, modifier = Modifier.size(15.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Backup Data", fontSize = 11.sp)
+                        Text("Backup DB", fontSize = 11.sp)
                     }
 
                     Button(
                         onClick = {
-                            viewModel.importDemoExcelBatch()
-                            Toast.makeText(context, "Data records refreshed & restored", Toast.LENGTH_SHORT).show()
+                            viewModel.loadSampleData {
+                                Toast.makeText(context, "Demo records populated", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = GailOrange),
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(15.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Restore Sample", fontSize = 11.sp)
+                        Text("Load Demo", fontSize = 11.sp)
                     }
                 }
+
+                // Clear All Stored Data (Clean Slate) Button
+                OutlinedButton(
+                    onClick = { showClearDbDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFDC2626))
+                ) {
+                    Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Clear All Saved Records (Reset Database)", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                }
             }
+        }
+
+        // Direct Mobile APK Download & Field Usage Instructions
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = GailNavy),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "DIRECT ANDROID MOBILE APP INSTALLATION",
+                    color = GailOrange,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    letterSpacing = 1.sp
+                )
+                Text(
+                    text = "If you do not have a desktop computer and wish to install this portal directly on an Android smartphone:",
+                    color = Color.White,
+                    fontSize = 12.sp
+                )
+                Text(
+                    text = "1. In Google AI Studio, locate the settings/overflow menu in the top navigation bar.\n2. Click 'Download project as ZIP' or select 'Generate APK' from the build options.\n3. Transfer or open the APK on your Android device to install the native app immediately.\n4. You can also test every feature directly inside the live streaming emulator preview in real-time.\n5. All records, surveys, JMRs, and DPR files are permanently stored in the local SQLite/Room database and remain secure across app restarts.",
+                    color = Color(0xFFCBD5E1),
+                    fontSize = 11.sp,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+
+        // Clear Database Confirmation Dialog
+        if (showClearDbDialog) {
+            AlertDialog(
+                onDismissRequest = { showClearDbDialog = false },
+                title = { Text("Clear All Database Records?") },
+                text = { Text("This will permanently delete all locally stored records (customers, visits, feasibility surveys, TNF cases, gas-in records, and DPR reports). You will start with a completely clean database.") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            viewModel.clearAllData {
+                                Toast.makeText(context, "All records cleared. Database is now empty.", Toast.LENGTH_LONG).show()
+                            }
+                            showClearDbDialog = false
+                        }
+                    ) {
+                        Text("Clear All Data", color = Color(0xFFDC2626), fontWeight = FontWeight.Bold)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showClearDbDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
 
         // Logout Button

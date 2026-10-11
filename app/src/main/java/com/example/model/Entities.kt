@@ -9,17 +9,17 @@ data class CustomerEntity(
     val id: Long = 0,
     val date: String, // YYYY-MM-DD
     val complaintNumber: String = "",
-    val bpNumber: String, // Business Partner No (e.g., 3400022314 from JMR)
-    val customerName: String, // Name of Consumer (e.g., Devendra Kumar)
-    val mobileNumber: String, // Mobile Number (e.g., 9910921088)
-    val houseNumber: String = "", // House No. / Flat No. (e.g., FF-01)
-    val address: String, // Address / Premise / Colony (e.g., Indus Realty Narmada)
-    val city: String = "Mandideep", // City Name (e.g., Mandideep, Bhopal)
-    val pincode: String = "462046", // Pincode
-    val requestType: String = "Domestic", // Domestic / Commercial
-    val connectionType: String = "New", // New / Reconnection
+    val bpNumber: String = "", // Not mandatory
+    val customerName: String = "", // Not mandatory
+    val mobileNumber: String = "",
+    val houseNumber: String = "",
+    val address: String = "",
+    val city: String = "Mandideep",
+    val pincode: String = "462046",
+    val requestType: String = "Domestic",
+    val connectionType: String = "New",
     val registrationStatus: String = RegistrationStatus.PENDING.name,
-    // Status can be: Feasible, TNF, GI Pending, GC Pending, GI Done, GC Done
+    // Can contain multiple comma-separated statuses like "Feasible, GI Pending"
     val feasibilityStatus: String = "Feasible",
     val departmentStatus: String = "Survey Done",
     val project: String = "GAIL Gas Mandideep CGD",
@@ -29,20 +29,20 @@ data class CustomerEntity(
     val colony: String = "",
     val employeeName: String = "",
     // JMR & Meter Details
-    val meterNumber: String = "", // Meter No. (e.g., 21241466)
-    val meterModel: String = "G1.6", // Model No.
-    val meterMake: String = "Raychem RPG", // Meter Type / Make
-    val meterReading: String = "0.022", // Initial Meter Reading
-    val regulatorNo: String = "", // Regulator No.
-    val burnersCount: String = "02", // Burner (e.g., 02)
-    val extraPipe: String = "Nill", // Extra Pipe (e.g., Nill / 5m)
+    val meterNumber: String = "",
+    val meterModel: String = "G1.6",
+    val meterMake: String = "Raychem RPG",
+    val meterReading: String = "0.022",
+    val regulatorNo: String = "",
+    val burnersCount: String = "02",
+    val extraPipe: String = "Nill",
     val meterInstallDate: String = "",
     val nextFollowUpDate: String = "",
     val customFieldsJson: String = "{}",
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val jmrPhotoUri: String? = null, // Direct JMR document photo URI
-    val meterPhotoUri: String? = null, // Direct Meter photo URI
+    val jmrPhotoUri: String? = null,
+    val meterPhotoUri: String? = null,
     val photoUrisJson: String = "[]",
     val syncState: String = SyncState.SYNCED.name,
     val isArchived: Boolean = false,
@@ -53,17 +53,17 @@ data class CustomerEntity(
 data class SiteVisitEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val customerBpNumber: String,
-    val customerName: String,
+    val customerBpNumber: String = "",
+    val customerName: String = "",
     val houseNumber: String = "",
     val city: String = "",
     val project: String = "",
     val visitDate: String, // YYYY-MM-DD
     val visitTime: String, // HH:mm
-    val employeeName: String,
-    val visitPurpose: String, // Feasibility, Registration, Metering, TNF, Complaint, Follow-up
-    val workPerformed: String,
-    val visitOutcome: String,
+    val employeeName: String = "",
+    val visitPurpose: String = "",
+    val workPerformed: String = "",
+    val visitOutcome: String = "",
     val remarks: String = "",
     val nextVisitDate: String = "",
     val latitude: Double? = null,
@@ -79,17 +79,19 @@ data class SiteVisitEntity(
 data class FeasibilityEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val bpNumber: String,
-    val customerName: String,
-    val mobileNumber: String,
+    val bpNumber: String = "", // None mandatory
+    val customerName: String = "",
+    val mobileNumber: String = "",
     val houseNumber: String = "",
     val address: String = "",
     val city: String = "",
     val project: String = "",
     val visitDate: String,
-    // Status options: Feasible, TNF, GI Pending, GC Pending, GI Done, GC Done
+    // Comma-separated multi-select statuses e.g. "Feasible, GI Done, GC Pending"
     val status: String = "Feasible",
     val remarks: String = "",
+    val photoUri: String? = null, // Optional Photo
+    val videoUri: String? = null, // Optional Video
     val syncState: String = SyncState.SYNCED.name,
     val createdAt: Long = System.currentTimeMillis()
 )
@@ -98,14 +100,14 @@ data class FeasibilityEntity(
 data class TnfEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val caseNumber: String,
-    val bpNumber: String,
-    val customerName: String,
-    val mobileNumber: String,
-    val address: String,
-    val project: String,
+    val caseNumber: String = "",
+    val bpNumber: String = "",
+    val customerName: String = "",
+    val mobileNumber: String = "",
+    val address: String = "",
+    val project: String = "",
     val category: String = "Customer Non-Availability",
-    val assignedEmployee: String,
+    val assignedEmployee: String = "",
     val status: String = TnfStatus.OPEN.name,
     val remarks: String = "",
     val followUpDate: String = "",
@@ -119,11 +121,11 @@ data class TnfEntity(
 data class GasInEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val bpNumber: String,
-    val customerName: String,
-    val requestDate: String,
+    val bpNumber: String = "",
+    val customerName: String = "",
+    val requestDate: String = "",
     val completionDate: String = "",
-    val gasInStatus: String = GasInStatus.NOT_STARTED.name,
+    val gasInStatus: String = GasInStatus.COMPLETED.name,
     val meterNumber: String = "",
     val meterMake: String = "",
     val meterReading: String = "",
@@ -134,8 +136,8 @@ data class GasInEntity(
     val remarks: String = "",
     val employeeName: String = "",
     val photoUri: String? = null,
-    val jmrPhotoUri: String? = null, // Optional JMR photo in Gas In
-    val meterPhotoUri: String? = null, // Optional Meter photo in Gas In
+    val jmrPhotoUri: String? = null, // Optional JMR photo
+    val meterPhotoUri: String? = null, // Optional Meter photo
     val syncState: String = SyncState.SYNCED.name,
     val createdAt: Long = System.currentTimeMillis()
 )
@@ -145,10 +147,10 @@ data class DprEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val reportDate: String, // YYYY-MM-DD
-    val title: String,
-    val project: String,
-    val preparedBy: String,
-    val formattedContentHtml: String,
+    val title: String = "",
+    val project: String = "",
+    val preparedBy: String = "",
+    val formattedContentHtml: String = "",
     val totalHousesVisited: Int = 0,
     val uniqueCustomers: Int = 0,
     val feasibleCount: Int = 0,

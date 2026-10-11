@@ -330,18 +330,17 @@ fun CustomerFormScreen(
                 }
             }
 
-            // Save Button
+            // Save Button (Kuch bhi mandatory nahi hai)
             Button(
                 onClick = {
-                    if (bpNumber.isBlank() || customerName.isBlank()) {
-                        Toast.makeText(context, "BP Number aur Customer Name likhna zaroori hai", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
+                    val safeBp = if (bpNumber.isBlank()) "BP" + (100000..999999).random() else bpNumber.trim()
+                    val safeName = if (customerName.isBlank()) "Consumer-${safeBp.takeLast(4)}" else customerName.trim()
+
                     val customer = CustomerEntity(
                         id = existingCustomer?.id ?: 0L,
                         date = existingCustomer?.date ?: today,
-                        bpNumber = bpNumber.trim(),
-                        customerName = customerName.trim(),
+                        bpNumber = safeBp,
+                        customerName = safeName,
                         mobileNumber = mobileNumber.trim(),
                         houseNumber = houseNumber.trim(),
                         city = city.trim(),

@@ -32,10 +32,12 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -88,6 +90,7 @@ fun DashboardScreen(
     onNavigateToGasIn: () -> Unit,
     onNavigateToVisitTracker: () -> Unit,
     onNavigateToDpr: () -> Unit,
+    onNavigateToReports: () -> Unit,
     onCustomerClick: (CustomerEntity) -> Unit
 ) {
     val context = LocalContext.current
@@ -248,6 +251,33 @@ fun DashboardScreen(
                             onClick = onNavigateToDpr
                         )
                     }
+                    item {
+                        QuickActionButton(
+                            title = "TNF Cases",
+                            subtitle = "Exceptions",
+                            icon = Icons.Default.Warning,
+                            color = Color(0xFFC2185B),
+                            onClick = onNavigateToTnf
+                        )
+                    }
+                    item {
+                        QuickActionButton(
+                            title = "Customers",
+                            subtitle = "BP Master",
+                            icon = Icons.Default.People,
+                            color = GailNavy,
+                            onClick = onNavigateToCustomers
+                        )
+                    }
+                    item {
+                        QuickActionButton(
+                            title = "Export Hub",
+                            subtitle = "Excel & PDF",
+                            icon = Icons.Default.TableChart,
+                            color = Color(0xFFE65100),
+                            onClick = onNavigateToReports
+                        )
+                    }
                 }
             }
         }
@@ -256,7 +286,7 @@ fun DashboardScreen(
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "FIELD VISIT HIGHLIGHTS ($selectedDateFilter)",
+                    text = "FIELD VISIT HIGHLIGHTS ($selectedDateFilter) - TAP TO VIEW",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -271,7 +301,8 @@ fun DashboardScreen(
                         subtitle = "Cumulative site visits",
                         icon = Icons.Default.LocationOn,
                         color = GailOrange,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToVisitTracker
                     )
                     MetricCard(
                         title = "Unique Customers",
@@ -279,7 +310,8 @@ fun DashboardScreen(
                         subtitle = "Distinct BP addresses",
                         icon = Icons.Default.Person,
                         color = GailNavy,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToVisitTracker
                     )
                 }
             }
@@ -289,7 +321,7 @@ fun DashboardScreen(
         item {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "FEASIBILITY & REGISTRATION SUMMARY",
+                    text = "FEASIBILITY & REGISTRATION SUMMARY - TAP TO VIEW",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -304,7 +336,8 @@ fun DashboardScreen(
                         subtitle = "Total surveyed",
                         icon = Icons.Default.CheckCircle,
                         color = Color(0xFF2E7D32),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToFeasibility
                     )
                     MetricCard(
                         title = "Feasible Cases",
@@ -312,7 +345,8 @@ fun DashboardScreen(
                         subtitle = "Approved pipeline route",
                         icon = Icons.Default.CheckCircle,
                         color = Color(0xFF388E3C),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToFeasibility
                     )
                 }
 
@@ -325,7 +359,8 @@ fun DashboardScreen(
                         subtitle = "Technical limitation",
                         icon = Icons.Default.Error,
                         color = Color(0xFFD32F2F),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToFeasibility
                     )
                     MetricCard(
                         title = "Pending Feas.",
@@ -333,7 +368,8 @@ fun DashboardScreen(
                         subtitle = "Awaiting visit",
                         icon = Icons.Default.Assignment,
                         color = Color(0xFFF57C00),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToFeasibility
                     )
                 }
 
@@ -346,7 +382,8 @@ fun DashboardScreen(
                         subtitle = "Agreements signed",
                         icon = Icons.Default.Assignment,
                         color = Color(0xFF1565C0),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToCustomers
                     )
                     MetricCard(
                         title = "Pending Reg.",
@@ -354,7 +391,8 @@ fun DashboardScreen(
                         subtitle = "Documents pending",
                         icon = Icons.Default.DateRange,
                         color = Color(0xFFE65100),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToCustomers
                     )
                 }
             }
@@ -364,7 +402,7 @@ fun DashboardScreen(
         item {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "TNF, GAS-IN & BACKLOG CONTROL",
+                    text = "TNF, GAS-IN & BACKLOG CONTROL - TAP TO VIEW",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -379,7 +417,8 @@ fun DashboardScreen(
                         subtitle = "Pending resolution",
                         icon = Icons.Default.Warning,
                         color = Color(0xFFC2185B),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToTnf
                     )
                     MetricCard(
                         title = "Closed TNF Cases",
@@ -387,7 +426,8 @@ fun DashboardScreen(
                         subtitle = "Cleared & bypassed",
                         icon = Icons.Default.CheckCircle,
                         color = Color(0xFF00796B),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToTnf
                     )
                 }
 
@@ -400,7 +440,8 @@ fun DashboardScreen(
                         subtitle = "Meters live & commissioned",
                         icon = Icons.Default.LocalGasStation,
                         color = Color(0xFF2E7D32),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToGasIn
                     )
                     MetricCard(
                         title = "Gas-in Pending",
@@ -408,7 +449,8 @@ fun DashboardScreen(
                         subtitle = "Riser line ready",
                         icon = Icons.Default.Speed,
                         color = Color(0xFF0288D1),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToGasIn
                     )
                 }
 
@@ -421,7 +463,8 @@ fun DashboardScreen(
                         subtitle = "Logged in system",
                         icon = Icons.Default.Build,
                         color = Color(0xFF5D4037),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToCustomers
                     )
                     MetricCard(
                         title = "Pending Follow-ups",
@@ -429,7 +472,8 @@ fun DashboardScreen(
                         subtitle = "Scheduled visits",
                         icon = Icons.Default.DateRange,
                         color = Color(0xFF512DA8),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        onClick = onNavigateToCustomers
                     )
                 }
             }
@@ -555,10 +599,11 @@ private fun MetricCard(
     subtitle: String,
     icon: ImageVector,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier,
+        modifier = if (onClick != null) modifier.clickable { onClick() } else modifier,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(14.dp)

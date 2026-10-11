@@ -39,11 +39,11 @@ class GailGasViewModel(application: Application) : AndroidViewModel(application)
             id = "EMP-1042",
             name = "Rajesh Sharma",
             email = "rajesh.pmc@gailgas.co.in",
-            role = UserRole.EMPLOYEE,
+            role = UserRole.SUPERVISOR,
             designation = "Senior PMC Field Supervisor",
             employeeId = "GG-PMC-4482",
-            mobile = "+91 98260 12345",
-            assignedProject = "Bhopal CGD Project"
+            mobile = "9826012345",
+            assignedProject = "Mandideep & Bhopal CGD"
         )
     )
     val currentUser: StateFlow<UserProfile> = _currentUser.asStateFlow()
@@ -115,62 +115,94 @@ class GailGasViewModel(application: Application) : AndroidViewModel(application)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
-        // Bootstrap initial records if database is fresh
+        // App starts with clean empty state - no pre-saved data, user enters their own data
+    }
+
+    /**
+     * Purges all locally stored records for a clean slate.
+     */
+    fun clearAllData(onComplete: () -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
-            val current = dao.getAllActiveCustomers()
-            // We can prefill if empty
-            launch {
-                dao.getAllActiveCustomers().collect { list ->
-                    if (list.isEmpty()) {
-                        dao.insertCustomers(SampleDataGenerator.generateInitialCustomers())
-                        SampleDataGenerator.generateInitialVisits().forEach { dao.insertVisit(it) }
-                        SampleDataGenerator.generateInitialFeasibilities().forEach { dao.insertFeasibility(it) }
-                        SampleDataGenerator.generateInitialTnf().forEach { dao.insertTnf(it) }
-                        SampleDataGenerator.generateInitialGasIn().forEach { dao.insertGasIn(it) }
-                        dao.insertDpr(SampleDataGenerator.generateInitialDpr())
-                    }
-                }
-            }
+            dao.clearCustomers()
+            dao.clearVisits()
+            dao.clearFeasibility()
+            dao.clearTnf()
+            dao.clearGasIn()
+            dao.clearDpr()
+            launch(Dispatchers.Main) { onComplete() }
+        }
+    }
+
+    /**
+     * Optional sample dataset loader for testing or demonstration.
+     */
+    fun loadSampleData(onComplete: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.insertCustomers(SampleDataGenerator.generateInitialCustomers())
+            SampleDataGenerator.generateInitialVisits().forEach { dao.insertVisit(it) }
+            SampleDataGenerator.generateInitialFeasibilities().forEach { dao.insertFeasibility(it) }
+            SampleDataGenerator.generateInitialTnf().forEach { dao.insertTnf(it) }
+            SampleDataGenerator.generateInitialGasIn().forEach { dao.insertGasIn(it) }
+            dao.insertDpr(SampleDataGenerator.generateInitialDpr())
+            launch(Dispatchers.Main) { onComplete() }
         }
     }
 
     // --- AUTHENTICATION & PROFILE ACTIONS ---
-    fun login(role: UserRole, email: String = "", name: String = "") {
+    fun loginWithRole(role: UserRole, identifier: String = "", name: String = "") = login(role, identifier, name)
+
+    fun login(role: UserRole, identifier: String = "", name: String = "") {
         when (role) {
             UserRole.ADMIN -> {
                 _currentUser.value = UserProfile(
                     id = "ADM-001",
                     name = "Virendra Singh",
-                    email = "admin.pmc@gailgas.co.in",
+                    email = if (identifier.contains("@")) identifier else "admin.pmc@gailgas.co.in",
                     role = UserRole.ADMIN,
                     designation = "PMC Chief Project Manager",
                     employeeId = "GG-PMC-ADMIN-01",
                     assignedProject = "Madhya Pradesh CGD Operations"
                 )
             }
-            UserRole.EMPLOYEE -> {
+            UserRole.SUPERVISOR -> {
                 _currentUser.value = UserProfile(
-                    id = "EMP-1042",
+                    id = "SUP-1042",
                     name = if (name.isNotBlank()) name else "Rajesh Sharma",
-                    email = if (email.isNotBlank()) email else "rajesh.pmc@gailgas.co.in",
-                    role = UserRole.EMPLOYEE,
-                    designation = "Senior Field Supervisor",
+                    email = if (identifier.contains("@")) identifier else "rajesh.pmc@gailgas.co.in",
+                    role = UserRole.SUPERVISOR,
+                    designation = "Senior PMC Field Supervisor",
                     employeeId = "GG-PMC-4482",
-                    assignedProject = "Bhopal CGD Project"
+                    mobile = if (identifier.all { it.isDigit() } && identifier.isNotBlank()) identifier else "9826012345",
+                    assignedProject = "Mandideep & Bhopal CGD"
                 )
             }
-            UserRole.GUEST -> {
+            UserRole.FIELD_ENGINEER -> {
                 _currentUser.value = UserProfile(
-                    id = "GST-999",
-                    name = "Demo Guest Inspector",
-                    email = "guest.inspector@gailgas.co.in",
-                    role = UserRole.GUEST,
-                    designation = "Observer / Guest Access",
-                    employeeId = "GUEST-DEMO",
-                    assignedProject = "Demo Sandbox"
+                    id = "ENG-2019",
+                    name = if (name.isNotBlank()) name else "Pawan / Gaurav",
+                    email = if (identifier.contains("@")) identifier else "field.survey@gailgas.co.in",
+                    role = UserRole.FIELD_ENGINEER,
+                    designation = "Field Gas & JMR Engineer",
+                    employeeId = "GG-ENG-2019",
+                    mobile = if (identifier.all { it.isDigit() } && identifier.isNotBlank()) identifier else "9910921088",
+                    assignedProject = "Mandideep Industrial & Domestic"
                 )
             }
         }
+        _isLoggedIn.value = true
+    }
+
+    fun registerNewOfficer(name: String, mobile: String, email: String, designation: String, project: String) {
+        _currentUser.value = UserProfile(
+            id = "REG-" + (1000..9999).random(),
+            name = name,
+            email = email,
+            role = UserRole.SUPERVISOR,
+            designation = designation,
+            employeeId = "GG-PMC-" + (1000..9999).random(),
+            mobile = mobile,
+            assignedProject = project
+        )
         _isLoggedIn.value = true
     }
 
@@ -236,6 +268,36 @@ class GailGasViewModel(application: Application) : AndroidViewModel(application)
     fun deleteCustomer(customer: CustomerEntity) {
         viewModelScope.launch(Dispatchers.IO) {
             dao.deleteCustomer(customer)
+        }
+    }
+
+    fun deleteSiteVisit(visit: SiteVisitEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteVisit(visit)
+        }
+    }
+
+    fun deleteFeasibility(feasibility: FeasibilityEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteFeasibility(feasibility)
+        }
+    }
+
+    fun deleteTnf(tnf: TnfEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteTnf(tnf)
+        }
+    }
+
+    fun deleteGasIn(gasIn: GasInEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteGasIn(gasIn)
+        }
+    }
+
+    fun deleteDpr(dpr: DprEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.deleteDpr(dpr)
         }
     }
 

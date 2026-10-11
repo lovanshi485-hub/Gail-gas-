@@ -55,6 +55,9 @@ interface GailGasDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVisit(visit: SiteVisitEntity): Long
 
+    @Delete
+    suspend fun deleteVisit(visit: SiteVisitEntity)
+
     // --- FEASIBILITY ---
     @Query("SELECT * FROM feasibility_surveys ORDER BY createdAt DESC")
     fun getAllFeasibility(): Flow<List<FeasibilityEntity>>
@@ -64,6 +67,9 @@ interface GailGasDao {
 
     @Update
     suspend fun updateFeasibility(feasibility: FeasibilityEntity)
+
+    @Delete
+    suspend fun deleteFeasibility(feasibility: FeasibilityEntity)
 
     // --- TNF ---
     @Query("SELECT * FROM tnf_cases ORDER BY createdAt DESC")
@@ -75,6 +81,9 @@ interface GailGasDao {
     @Update
     suspend fun updateTnf(tnf: TnfEntity)
 
+    @Delete
+    suspend fun deleteTnf(tnf: TnfEntity)
+
     // --- GAS-IN ---
     @Query("SELECT * FROM gas_in_records ORDER BY createdAt DESC")
     fun getAllGasInRecords(): Flow<List<GasInEntity>>
@@ -84,6 +93,9 @@ interface GailGasDao {
 
     @Update
     suspend fun updateGasIn(gasIn: GasInEntity)
+
+    @Delete
+    suspend fun deleteGasIn(gasIn: GasInEntity)
 
     // --- DPR ---
     @Query("SELECT * FROM dpr_reports ORDER BY reportDate DESC, updatedAt DESC")
@@ -97,6 +109,9 @@ interface GailGasDao {
 
     @Update
     suspend fun updateDpr(dpr: DprEntity)
+
+    @Delete
+    suspend fun deleteDpr(dpr: DprEntity)
 
     // --- OFFLINE & SYNC QUERIES ---
     @Query("SELECT COUNT(*) FROM customers WHERE syncState != 'SYNCED'")
@@ -119,4 +134,23 @@ interface GailGasDao {
 
     @Query("UPDATE dpr_reports SET syncState = 'SYNCED'")
     suspend fun markAllDprSynced()
+
+    // --- RESET & PURGE DATABASE ---
+    @Query("DELETE FROM customers")
+    suspend fun clearCustomers()
+
+    @Query("DELETE FROM site_visits")
+    suspend fun clearVisits()
+
+    @Query("DELETE FROM feasibility_surveys")
+    suspend fun clearFeasibility()
+
+    @Query("DELETE FROM tnf_cases")
+    suspend fun clearTnf()
+
+    @Query("DELETE FROM gas_in_records")
+    suspend fun clearGasIn()
+
+    @Query("DELETE FROM dpr_reports")
+    suspend fun clearDpr()
 }

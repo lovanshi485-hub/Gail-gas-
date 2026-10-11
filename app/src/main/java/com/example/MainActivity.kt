@@ -177,6 +177,7 @@ fun MainAppContent(viewModel: GailGasViewModel) {
                     onNavigateToGasIn = { currentScreen = AppScreen.GAS_IN },
                     onNavigateToVisitTracker = { currentScreen = AppScreen.VISIT_TRACKER },
                     onNavigateToDpr = { currentScreen = AppScreen.DPR_EDITOR },
+                    onNavigateToReports = { currentScreen = AppScreen.REPORTS },
                     onCustomerClick = {
                         selectedCustomerForDetail = it
                         currentScreen = AppScreen.CUSTOMER_DETAIL

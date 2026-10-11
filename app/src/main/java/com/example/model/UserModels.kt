@@ -2,19 +2,19 @@ package com.example.model
 
 enum class UserRole {
     ADMIN,
-    EMPLOYEE,
-    GUEST
+    SUPERVISOR,
+    FIELD_ENGINEER
 }
 
 data class UserProfile(
     val id: String = "EMP-1042",
     val name: String = "Rajesh Sharma",
     val email: String = "rajesh.pmc@gailgas.co.in",
-    val role: UserRole = UserRole.EMPLOYEE,
+    val role: UserRole = UserRole.SUPERVISOR,
     val designation: String = "Senior PMC Field Supervisor",
     val employeeId: String = "GG-PMC-4482",
-    val mobile: String = "+91 98765 43210",
-    val assignedProject: String = "Bhopal City Gas Distribution Phase 2",
+    val mobile: String = "9826012345",
+    val assignedProject: String = "Mandideep & Bhopal CGD",
     val profilePhotoUrl: String? = null
 )
 
